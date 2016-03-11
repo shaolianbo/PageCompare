@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <title>charts</title>
+</head>
+<body>
+  <div class="container">
+    <h2>{{object.time}}</h2>
+    <h3>完全加载时间(ms)</h3>
+    <table class="table table-bordered">
+      <tr>
+        {% for url in urls %}
+          <td>{{url}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        {% for time in result.load_complete_time%}
+            <td>{{time}}</td>
+        {% endfor %}
+      </tr>
+    </table>
+    <h3>元素大小(Bytes)</h3>
+    <table class="table table-bordered">
+      <tr>
+        <td></td>
+        {% for url in urls %}
+          <td>{{url}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>doc</td>
+        {% for value in result.size.doc %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>js</td>
+        {% for value in result.size.js %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>css</td>
+        {% for value in result.size.css %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>img</td>
+        {% for value in result.size.img %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>other</td>
+        {% for value in result.size.other %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>all</td>
+        {% for value in result.size.all %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+    </table>
+    <h3>元素数量</h3>
+    <table class="table table-bordered">
+      <tr>
+        <td></td>
+        {% for url in urls %}
+          <td>{{url}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>js</td>
+        {% for value in result.count.js %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>css</td>
+        {% for value in result.count.css %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>img</td>
+        {% for value in result.count.img %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>other</td>
+        {% for value in result.count.other %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>all</td>
+        {% for value in result.count.all %}
+        <td>{{value}}</td>
+        {% endfor %}
+      </tr>
+    </table>
+  </div>
+</body>
+<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</html>
