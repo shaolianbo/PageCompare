@@ -52,9 +52,9 @@ function createHAR(address, title, startTime, resources)
                 headers: endReply.headers,
                 redirectURL: "",
                 headersSize: -1,
-                bodySize: startReply.bodySize,
+                bodySize: resource.responseBodySize,
                 content: {
-                    size: startReply.bodySize,
+                    size: resource.responseBodySize,
                     mimeType: endReply.contentType
                 }
             },
@@ -112,7 +112,8 @@ if (system.args.length === 1) {
         page.resources[req.id] = {
             request: req,
             startReply: null,
-            endReply: null
+            endReply: null,
+            responseBodySize: 0
         };
     };
 
@@ -123,9 +124,17 @@ if (system.args.length === 1) {
         if (res.stage === 'end') {
             page.resources[res.id].endReply = res;
         }
+        if(res.bodySize){
+            page.resources[res.id].responseBodySize += res.bodySize;
+        }
     };
 
-    page.open(page.address, function (status) {
+    var loadCount = 0
+
+    var finalHar = []
+
+    function loadCallback(status) {
+        loadCount ++;
         var har;
         if (status !== 'success') {
             console.log('FAIL to load the address');
@@ -136,9 +145,17 @@ if (system.args.length === 1) {
                 return document.title;
             });
             har = createHAR(page.address, page.title, page.startTime, page.resources);
-            console.log('xafexdfea980!adaf*>M')
-            console.log(JSON.stringify(har, undefined, 4));
-            phantom.exit();
+            finalHar.push(har);
+            if(loadCount==2){
+                console.log('xafexdfea980!adaf*>M')
+                console.log(JSON.stringify(finalHar, undefined, 4));
+                phantom.exit(1);
+            }else{
+                page.resources = [];
+                page.open(page.address, loadCallback);
+            }
         }
-    });
+    }
+
+    page.open(page.address, loadCallback);
 }
