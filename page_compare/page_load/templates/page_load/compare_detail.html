@@ -12,68 +12,103 @@
     <h2>{{object.time}}</h2>
     <h3>完全加载时间(ms)</h3>
     <table class="table table-bordered">
-      <tr>
-        {% for url in urls %}
-          <td>{{url}}</td>
-        {% endfor %}
-      </tr>
-      <tr>
-        {% for time in result.load_complete_time%}
-            <td>{{time}}</td>
-        {% endfor %}
-      </tr>
+      <thead>
+        <tr>
+          {% for url in urls %}
+          <th colspan="2"><a href="/load_result/{{url.id}}/">{{url.url}}</th>
+          {% endfor %}
+        </tr>
+        <tr>
+          {% for url in urls %}
+            <th>无缓存</th>
+            <th>带缓存</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          {% for time in result.load_complete_time%}
+          <td>{{time}}</td>
+          {% endfor %}
+        </tr>
+      </tbody>
     </table>
     <h3>元素大小(Bytes)</h3>
     <table class="table table-bordered">
-      <tr>
-        <td></td>
-        {% for url in urls %}
-          <td>{{url}}</td>
-        {% endfor %}
-      </tr>
-      <tr>
-        <td>doc</td>
-        {% for value in result.size.doc %}
-        <td>{{value}}</td>
-        {% endfor %}
-      </tr>
-      <tr>
-        <td>js</td>
-        {% for value in result.size.js %}
-        <td>{{value}}</td>
-        {% endfor %}
-      </tr>
-      <tr>
-        <td>css</td>
-        {% for value in result.size.css %}
-        <td>{{value}}</td>
-        {% endfor %}
-      </tr>
-      <tr>
-        <td>img</td>
-        {% for value in result.size.img %}
-        <td>{{value}}</td>
-        {% endfor %}
-      </tr>
-      <tr>
-        <td>other</td>
-        {% for value in result.size.other %}
-        <td>{{value}}</td>
-        {% endfor %}
-      </tr>
-      <tr>
-        <td>all</td>
-        {% for value in result.size.all %}
-        <td>{{value}}</td>
-        {% endfor %}
-      </tr>
+      <thead>
+        <tr>
+          <th rowspan="2"></th>
+          {% for url in urls %}
+          <th colspan="2"><a href="/load_result/{{url.id}}/">{{url.url}}</th>
+          {% endfor %}
+        </tr>
+        <tr>
+          {% for url in urls %}
+            <th>无缓存</th>
+            <th>带缓存</th>
+          {% endfor %}
+        </tr>
+      </thead>
+        <tbody>
+          <tr>
+            <td>doc</td>
+            {% for value in result.size.doc %}
+            <td>{{value}}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td>js</td>
+            {% for value in result.size.js %}
+            <td>{{value}}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td>css</td>
+            {% for value in result.size.css %}
+            <td>{{value}}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td>img</td>
+            {% for value in result.size.img %}
+            <td>{{value}}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td>other</td>
+            {% for value in result.size.other %}
+            <td>{{value}}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td>all</td>
+            {% for value in result.size.all %}
+            <td>{{value}}</td>
+            {% endfor %}
+          </tr>
+        </tbody>
     </table>
     <h3>元素数量</h3>
     <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th rowspan="2"></th>
+          {% for url in urls %}
+          <th colspan="2"><a href="/load_result/{{url.id}}/">{{url.url}}</th>
+          {% endfor %}
+        </tr>
+        <tr>
+          {% for url in urls %}
+            <th>无缓存</th>
+            <th>带缓存</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
       <tr>
-        <td></td>
-        {% for url in urls %}
-          <td>{{url}}</td>
+        <td>doc</td>
+        {% for value in result.count.doc %}
+        <td>{{value}}</td>
         {% endfor %}
       </tr>
       <tr>
@@ -106,6 +141,7 @@
         <td>{{value}}</td>
         {% endfor %}
       </tr>
+    </tbody>
     </table>
   </div>
 </body>

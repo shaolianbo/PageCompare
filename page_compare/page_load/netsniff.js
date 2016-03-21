@@ -21,7 +21,7 @@ function createHAR(address, title, startTime, resources)
             startReply = resource.startReply,
             endReply = resource.endReply;
 
-        if (!request || !startReply || !endReply) {
+        if (!request) {
             return;
         }
 
@@ -33,7 +33,7 @@ function createHAR(address, title, startTime, resources)
 
         entries.push({
             startedDateTime: request.time.toISOString(),
-            time: endReply.time - request.time,
+            time: resource.endTime - request.time,
             request: {
                 method: request.method,
                 url: request.url,
@@ -45,17 +45,17 @@ function createHAR(address, title, startTime, resources)
                 bodySize: -1
             },
             response: {
-                status: endReply.status,
-                statusText: endReply.statusText,
+                status: resource.status,
+                statusText: resource.status,
                 httpVersion: "HTTP/1.1",
                 cookies: [],
-                headers: endReply.headers,
+                headers: endReply && endReply.headers || "",
                 redirectURL: "",
                 headersSize: -1,
                 bodySize: resource.responseBodySize,
                 content: {
                     size: resource.responseBodySize,
-                    mimeType: endReply.contentType
+                    mimeType: endReply && endReply.contentType || ""
                 }
             },
             cache: {},
@@ -64,8 +64,8 @@ function createHAR(address, title, startTime, resources)
                 dns: -1,
                 connect: -1,
                 send: 0,
-                wait: startReply.time - request.time,
-                receive: endReply.time - startReply.time,
+                wait: 0,
+                receive: 0,
                 ssl: -1
             },
             pageref: address
@@ -95,6 +95,7 @@ function createHAR(address, title, startTime, resources)
 
 var page = require('webpage').create(),
     system = require('system');
+    page.settings.userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1';
 
 if (system.args.length === 1) {
     console.log('Usage: netsniff.js <some URL>');
@@ -113,7 +114,9 @@ if (system.args.length === 1) {
             request: req,
             startReply: null,
             endReply: null,
-            responseBodySize: 0
+            responseBodySize: 0,
+            status: 0,
+            endTime: 0
         };
     };
 
@@ -123,18 +126,33 @@ if (system.args.length === 1) {
         }
         if (res.stage === 'end') {
             page.resources[res.id].endReply = res;
+            page.resources[res.id].endTime = res.time;
+            page.resources[res.id].status = res.status;
         }
         if(res.bodySize){
             page.resources[res.id].responseBodySize += res.bodySize;
         }
     };
 
-    var loadCount = 0
+    page.onResourceTimeout = function (res) {
+        page.resources[res.id].endTime = new Date();
+        page.resources[res.id].status = res.errorCode;
+    };
 
-    var finalHar = []
+    page.onResourceError = function (res) {
+        page.resources[res.id].endTime = new Date();
+        page.resources[res.id].status = res.errorCode;
+    };
+
+    var loadCount = 0;
+    var finalHar = [];
+    var docContent = "";
 
     function loadCallback(status) {
         loadCount ++;
+        if(loadCount == 1){
+            docContent = page.content;
+        }
         var har;
         if (status !== 'success') {
             console.log('FAIL to load the address');
@@ -148,7 +166,11 @@ if (system.args.length === 1) {
             finalHar.push(har);
             if(loadCount==2){
                 console.log('xafexdfea980!adaf*>M')
-                console.log(JSON.stringify(finalHar, undefined, 4));
+                var result = {
+                    content: docContent,
+                    hars: finalHar
+                };
+                console.log(JSON.stringify(result, undefined, 4));
                 phantom.exit(1);
             }else{
                 page.resources = [];

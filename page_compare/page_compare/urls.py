@@ -1,10 +1,10 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-from page_load.views import analyse_page, CompareList, CompareDetail
-from page_load.models import LoadResult, Compare
+from page_load.views import analyse_page, CompareList, CompareDetail, load_result
+from page_load.models import Compare
 
-admin.site.register(LoadResult)
+# admin.site.register(LoadResult)
 admin.site.register(Compare)
 
 urlpatterns = patterns('',
@@ -15,4 +15,5 @@ urlpatterns = patterns('',
     url(r'^run/', analyse_page),
     url(r'^load_compare/', CompareList.as_view()),
     url(r'^compare_detail/(?P<pk>[0-9]+)/$', CompareDetail.as_view()),
+    url(r'^load_result/(\d+)/$', load_result),
 )

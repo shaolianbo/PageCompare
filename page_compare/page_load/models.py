@@ -19,7 +19,7 @@ class Compare(models.Model):
 
 class LoadResult(models.Model):
     time = models.DateTimeField(blank=False, auto_now=True, verbose_name='时间')
-    url = models.CharField(blank=False, max_length=100, verbose_name='地址')
+    url = models.CharField(blank=False, max_length=1000, verbose_name='地址')
     result = models.TextField(blank=False, verbose_name='加载结果json')
     compare = models.ForeignKey(Compare, on_delete=models.CASCADE, verbose_name='相关比较')
 
