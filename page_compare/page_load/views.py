@@ -2,13 +2,17 @@
 import json
 from threading import Thread
 
-from django.http.response import HttpResponse, Http404
+from django.http.response import HttpResponse, Http404, JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.shortcuts import redirect
 
-from .utils import load_page, analyse_load_result_with_cache, get_init_result, get_init_combined_result, combine_result
+from .utils import (
+    load_page, analyse_load_result_with_cache,
+    get_init_result, get_init_combined_result,
+    combine_result, test_all_request, make_result_readable
+)
 from .models import LoadResult, Compare
 
 
@@ -71,6 +75,8 @@ class CompareDetail(DetailView):
                 analyse_result_with_cache = get_init_result()
             else:
                 analyse_result_without_cache, analyse_result_with_cache = analyse_load_result_with_cache(json_result, load_result.url)
+                analyse_result_without_cache = make_result_readable(analyse_result_without_cache)
+                analyse_result_with_cache = make_result_readable(analyse_result_with_cache)
             combine_result(result, analyse_result_without_cache)
             combine_result(result, analyse_result_with_cache)
         context = {}
@@ -84,8 +90,30 @@ def load_result(request, load_id):
     try:
         load = LoadResult.objects.get(pk=load_id)
     except LoadResult.DoesNotExist:
-        raise Http404('load result %s' % load_id)
+        return Http404('load result %s' % load_id)
     url = load.url
     urls = [url]
     load_results = load_page_by_thread(urls)
     return HttpResponse(load_results[url]['content'])
+
+
+def page_requests(request, load_id):
+    try:
+        load = LoadResult.objects.get(pk=load_id)
+    except LoadResult.DoesNotExist:
+        return Http404('load result %s' % load_id)
+    load_results = json.loads(load.result)
+    if len(load_results) != 2:
+        return Http404('load result find but format wrong')
+    view_result = {}
+    urls_without_cache = test_all_request(load_results[0])
+    urls_with_cache = test_all_request(load_results[1])
+    view_result[u'无缓存'] = {
+        'count': len(urls_without_cache),
+        'urls': urls_without_cache
+    }
+    view_result[u'带缓存'] = {
+        'count': len(urls_with_cache),
+        'urls': urls_with_cache
+    }
+    return JsonResponse(view_result)

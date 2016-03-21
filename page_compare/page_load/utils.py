@@ -11,7 +11,7 @@ def load_page(url):
     t = None
     default_result = {'content': "", "hars": []}
     try:
-        pro = Popen(['phantomjs', js_file, url], stdout=PIPE, stderr=STDOUT)
+        pro = Popen(['phantomjs', '--web-security=false', js_file, url], stdout=PIPE, stderr=STDOUT)
         t = Timer(60*5, pro.kill)
         t.start()
         stdoutdata, stderrdata = pro.communicate()
@@ -68,6 +68,25 @@ def get_init_result():
     return final_result
 
 
+def _size_human_readable(size):
+    units = ['KB', 'MB', 'GB']
+    now_unit = 'B'
+    now_size = float(size)
+    for unit in units:
+        if now_size > 1024:
+            now_size = now_size / 1024
+            now_unit = unit
+        else:
+            break
+    return "%s%s" % (round(now_size, 2), now_unit)
+
+
+def make_result_readable(result):
+    for key in result['size'].keys():
+        result['size'][key] = _size_human_readable(result['size'][key])
+    return result
+
+
 def get_init_combined_result():
     combined_result = {
         'size': {
@@ -113,8 +132,7 @@ def analyse_load_result(result, url):
 
 def test_all_request(result):
     entries = result['log']['entries']
-    for entry in entries:
-        print entry['request']['url']
+    return ["[%s]%s" % (entry['response']['status'], entry['request']['url']) for entry in entries]
 
 
 def analyse_load_result_with_cache(results, url):
